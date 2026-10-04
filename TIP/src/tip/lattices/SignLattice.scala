@@ -129,15 +129,15 @@ object SignLattice extends FlatLattice[SignElement.Value] with LatticeWithOps {
         if (leq(a, b)) {
           if (!leq(op(a, c), op(b, c))) {   // hint: when is f(a, c) ⊑ f(b, c) violated?
             println(s"Function ~$name~ NOT monotone in 1st arg: $a <= $b but op($a, $c) = ${op(a, c)} and op($b, $c) = ${op(b, c)}")
-            return
+            // return
           }
           if (!leq(op(c, a), op(c, b))) {
             println(s"Function ~$name~ NOT monotone in 2nd arg: $a <= $b but op($c, $a) = ${op(c, a)} and op($c, $b) = ${op(c, b)}")
-            return          
+            // return          
           }
         }
       }
-      println("still MONOTONIC...")
+      // println("still MONOTONIC...")
   }
 
 
@@ -156,10 +156,10 @@ object SignLattice extends FlatLattice[SignElement.Value] with LatticeWithOps {
     for (a <- signValues.keys; b <- signValues.keys if leq(a, b)) {
       if (!leq(plus10Abstract(a), plus10Abstract(b))){
         println(s"Is NOT monotonic because: ($a) <= ($b) but f(${plus10Abstract(a)}) > f(${plus10Abstract(b)})")
-        return
+        // return
       }
     }
-    println("It IS MONOTONIC!")
+    // println("It IS MONOTONIC!")
     
     // println("Now Testing Plus + case...")
     // for (a <- signValues.keys; b <- signValues.keys; c <- signValues.keys) {
