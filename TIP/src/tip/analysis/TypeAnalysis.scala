@@ -136,7 +136,7 @@ class TypeAnalysis(program: AProgram)(implicit declData: DeclarationData) extend
           // *E : E is a HEAP cell or a borrowed pointer, so its kind is left open
           case DerefOp => unify(un.subexp, RefType(FreshVarType(), un)) // <--- COMPLETED
         }
-      case alloc: AAlloc => unify(alloc, HeapType(alloc.exp)) // <--- COMPLETED
+      case alloc: AAlloc => unify(alloc, HeapType(alloc, alloc.exp)) // <--- COMPLETED
       case ref: AVarRef => unify(ref, PointerType(ref.id)) // <--- COMPLETED
       // null can stand for either kind of reference. Alpha is chosen.
       case nul: ANull => unify(nul,RefType(FreshVarType(), FreshVarType())) // <--- COMPLETED
