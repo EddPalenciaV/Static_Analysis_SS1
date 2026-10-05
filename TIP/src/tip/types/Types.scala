@@ -81,28 +81,83 @@ case class FunctionType(params: List[Term[Type]], ret: Term[Type]) extends Type 
 }
 
 /**
-  * Pointer type.
+  * Kind of a reference: owned heap cell (HEAP) or borrowed pointer (↑).
+  * A reference whose kind is not yet known uses a type variable as its kind.
   */
-case class PointerType(of: Term[Type]) extends Type with Cons[Type] {
+case object HeapKind extends Type with Cons[Type] {
 
-  val args: List[Term[Type]] = List(of)
+  val args: List[Term[Type]] = List()
 
-  def subst(v: Var[Type], t: Term[Type]): Term[Type] = PointerType(of.subst(v, t))
+  def subst(v: Var[Type], t: Term[Type]): Term[Type] = this
 
-  override def toString: String = s"\u2B61$of"
+  override def toString: String = "HEAP"
+}
+
+case object BorrowKind extends Type with Cons[Type] {
+
+  val args: List[Term[Type]] = List()
+
+  def subst(v: Var[Type], t: Term[Type]): Term[Type] = this
+
+  override def toString: String = "\u2B61"
 }
 
 /**
-  * HEAP type.
+  * Reference type: a single constructor for both HEAP cells and borrowed pointers,
+  * so that `*` can be overloaded by unifying with a fresh kind.
   */
-case class HeapType(of: Term[Type]) extends Type with Cons[Type] {
+case class RefType(kind: Term[Type], of: Term[Type]) extends Type with Cons[Type] {
 
-  val args: List[Term[Type]] = List(of)
+  val args: List[Term[Type]] = List(kind, of)
 
-  def subst(v: Var[Type], t: Term[Type]): Term[Type] = HeapType(of.subst(v, t))
+  def subst(v: Var[Type], t: Term[Type]): Term[Type] = RefType(kind.subst(v, t), of.subst(v, t))
 
-  override def toString: String = s"HEAP_$of"
+  override def toString: String = kind match {
+    case HeapKind => s"HEAP $of"
+    case BorrowKind => s"\u2B61$of"
+    case k => s"REF[$k] $of"
+  }
 }
+
+/**
+  * Borrowed pointer type ↑T.
+  */
+object PointerType {
+  def apply(of: Term[Type]): RefType = RefType(BorrowKind, of)
+}
+
+/**
+  * Owned heap cell type HEAP T.
+  */
+object HeapType {
+  def apply(of: Term[Type]): RefType = RefType(HeapKind, of)
+}
+
+
+/**
+  * Pointer type.
+  */
+// case class PointerType(of: Term[Type]) extends Type with Cons[Type] {
+
+//   val args: List[Term[Type]] = List(of)
+
+//   def subst(v: Var[Type], t: Term[Type]): Term[Type] = PointerType(of.subst(v, t))
+
+//   override def toString: String = s"\u2B61$of"
+// }
+
+/**
+  * HEAP type testing.
+  */
+// case class HeapType(of: Term[Type]) extends Type with Cons[Type] {
+
+//   val args: List[Term[Type]] = List(of)
+
+//   def subst(v: Var[Type], t: Term[Type]): Term[Type] = HeapType(of.subst(v, t))
+
+//   override def toString: String = s"HEAP_$of"
+// }
+
 
 /**
   * Record type.
