@@ -47,20 +47,10 @@ class UnionFindSolver[A] {
             log.verb(s"Unifying subterms $a1 and $a2")
             unify(a1, a2)
         }
-      case (f1: Cons[A], f2: Cons[A]) if join(f1, f2).isDefined =>
-        // two different constants that can be joined: the join becomes the representative
-        if (join(f1, f2).get == f1) mkUnion(f2, f1) else mkUnion(f1, f2)
       case (x, y) =>
         throw new UnificationFailure(s"Cannot unify $t1 and $t2 (with representatives $x and $y)")
     }
   }
-
-  /**
-    * Joins two different constructor terms that do not match, instead of failing.
-    * Returns the term that should become the representative, or None if they cannot be joined.
-    * By default nothing can be joined, which gives ordinary unification.
-    */
-  protected def join(c1: Cons[A], c2: Cons[A]): Option[Cons[A]] = None
 
   /**
     * Returns the canonical element of the equivalence class of the term `t`.

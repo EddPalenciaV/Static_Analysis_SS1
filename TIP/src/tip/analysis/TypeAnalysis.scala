@@ -26,14 +26,7 @@ class TypeAnalysis(program: AProgram)(implicit declData: DeclarationData) extend
 
   val log = Log.logger[this.type]()
 
-  val solver = new UnionFindSolver[Type] {
-    // kinds are ordered HEAP ⊑ ↑, so a HEAP kind unified with a ↑ kind becomes ↑ Type
-    override protected def join(c1: Cons[Type], c2: Cons[Type]): Option[Cons[Type]] =
-      (c1, c2) match {
-        case (_: HeapKind, BorrowKind) | (BorrowKind, _: HeapKind) => Some(BorrowKind)
-        case _ => None
-      }
-  }
+  val solver = new UnionFindSolver[Type]
 
   implicit val allFieldNames: List[String] = program.appearingFields.toList.sorted
 
@@ -143,7 +136,7 @@ class TypeAnalysis(program: AProgram)(implicit declData: DeclarationData) extend
           // *E : E is a HEAP cell or a borrowed pointer, so its kind is left open
           case DerefOp => unify(un.subexp, RefType(FreshVarType(), un)) // <--- COMPLETED
         }
-      case alloc: AAlloc => unify(alloc, HeapType(alloc, alloc.exp)) // <--- COMPLETED
+      case alloc: AAlloc => unify(alloc, HeapType(alloc.exp)) // <--- COMPLETED
       case ref: AVarRef => unify(ref, PointerType(ref.id)) // <--- COMPLETED
       // null can stand for either kind of reference. Alpha is chosen.
       case nul: ANull => unify(nul,RefType(FreshVarType(), FreshVarType())) // <--- COMPLETED

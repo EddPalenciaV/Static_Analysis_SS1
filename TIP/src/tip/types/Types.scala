@@ -84,24 +84,7 @@ case class FunctionType(params: List[Term[Type]], ret: Term[Type]) extends Type 
   * Kind of a reference: owned heap cell (HEAP) or borrowed pointer (↑).
   * A reference whose kind is not yet known uses a type variable as its kind.
   */
-// case object HeapKind extends Type with Cons[Type] {
-
-//   val args: List[Term[Type]] = List()
-
-//   def subst(v: Var[Type], t: Term[Type]): Term[Type] = this
-
-//   override def toString: String = "HEAP"
-// }
-
-/**
-  * Kind of a reference: owned heap cell (HEAP) or borrowed pointer (↑).
-  * A reference whose kind is not yet known uses a type variable as its kind.
-  * Kinds are ordered HEAP ⊑ ↑: when a HEAP kind meets a ↑ kind, unification joins them to ↑.
-  *
-  * Each allocation site has its own HEAP kind, so that joining one allocation with ↑
-  * does not affect unrelated allocations.
-  */
-case class HeapKind(site: AstNode) extends Type with Cons[Type] {
+case object HeapKind extends Type with Cons[Type] {
 
   val args: List[Term[Type]] = List()
 
@@ -130,7 +113,7 @@ case class RefType(kind: Term[Type], of: Term[Type]) extends Type with Cons[Type
   def subst(v: Var[Type], t: Term[Type]): Term[Type] = RefType(kind.subst(v, t), of.subst(v, t))
 
   override def toString: String = kind match {
-    case _: HeapKind => s"HEAP $of"
+    case HeapKind => s"HEAP $of"
     case BorrowKind => s"\u2B61$of"
     case k => s"REF[$k] $of"
   }
@@ -147,7 +130,7 @@ object PointerType {
   * Owned heap cell type HEAP T.
   */
 object HeapType {
-  def apply(site: AstNode, of: Term[Type]): RefType = RefType(HeapKind(site), of)
+  def apply(of: Term[Type]): RefType = RefType(HeapKind, of)
 }
 
 
