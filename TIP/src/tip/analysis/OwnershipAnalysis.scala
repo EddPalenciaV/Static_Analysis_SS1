@@ -69,16 +69,7 @@ class OwnershipAnalysis(cfg: IntraproceduralProgramCfg)(implicit declData: Decla
   protected def initialParamStatus(fun: AFunDeclaration, param: AIdentifierDeclaration): valuelattice.Element =
     if (fun.name == "main") FlatEl(Other) else Top
 
-  /**
-    * Name used for a dereferenced expression in messages.
-    */
-  private def nameOf(exp: AExpr): String =
-    exp match {
-      case id: AIdentifier => id.name
-      case e => e.toString
-    }
-
-  /**
+    /**
     * Abstract evaluation of expressions, including the ownership checks on `&x` and `*x`.
     */
   def eval(exp: AExpr, env: statelattice.Element): valuelattice.Element =
@@ -97,7 +88,7 @@ class OwnershipAnalysis(cfg: IntraproceduralProgramCfg)(implicit declData: Decla
         if (env(declData(ref.id)) == FlatEl(Other))
           msgs.message(msgs.Reason.None, ref.loc)
         else
-          msgs.message(msgs.Reason.OwnershipError, ref.loc, s"cannot take address of non-stack variable: ${ref.id.name}")
+          msgs.message(msgs.Reason.OwnershipError, ref.loc, s"cannot take address of non-stack variable: ${ref.id}")
         FlatEl(Pointer)
       case AUnaryOp(DerefOp, sub, loc) => // *x
         // Rule: overloaded dereference: allowed through a pointer or by the owner of a heap cell
@@ -105,9 +96,9 @@ class OwnershipAnalysis(cfg: IntraproceduralProgramCfg)(implicit declData: Decla
           case FlatEl(Pointer) | FlatEl(HeapOwner) =>
             msgs.message(msgs.Reason.None, loc)
           case Top =>
-            msgs.message(msgs.Reason.OwnershipWarning, loc, s"dereference when may not be owner: ${nameOf(sub)}")
+            msgs.message(msgs.Reason.OwnershipWarning, loc, s"dereference when may not be owner: $sub")
           case _ =>
-            msgs.message(msgs.Reason.OwnershipError, loc, s"illegal dereference when not owner: ${nameOf(sub)}")
+            msgs.message(msgs.Reason.OwnershipError, loc, s"illegal dereference when not owner: $sub")
         }
         FlatEl(Other) // all heap cells and pointers contain integers
       case _: ANull => FlatEl(Pointer) // NOTE: null is not a HEAP cell with an owner. It should be a non-heap Pointer
@@ -148,7 +139,7 @@ class OwnershipAnalysis(cfg: IntraproceduralProgramCfg)(implicit declData: Decla
               case FlatEl(Pointer) | FlatEl(HeapOwner) =>
                 msgs.message(msgs.Reason.None, dw.loc)
               case _ =>
-                msgs.message(msgs.Reason.OwnershipError, dw.loc, s"illegal store when not owner or pointer: ${nameOf(dw.exp)}")
+                msgs.message(msgs.Reason.OwnershipError, dw.loc, s"illegal store when not owner or pointer: ${dw.exp}")
             }
             s // State does not change. No change in ownership status. Only change in heap cell's content
 
