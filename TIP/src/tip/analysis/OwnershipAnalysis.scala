@@ -60,7 +60,7 @@ class OwnershipAnalysis(cfg: IntraproceduralProgramCfg)(implicit declData: Decla
   NoRecords.assertContainsProgram(cfg.prog)
 
   /**
-    * Preparing for Section 5
+    * Preparing for Section 5 - protected method so it can be overridden
     * The initial ownership status of a function parameter.
     * The parameters of <main> are always integers.
     * Other parameters are unknown in this untyped analysis, so they start at Top.
