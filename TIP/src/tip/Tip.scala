@@ -103,7 +103,7 @@ object Tip extends App {
         | -sign              enable sign analysis
         | -livevars          enable live variables analysis
         | -ownership         enable ownership analysis - by Edd PV
-        | -typedownership    enable typed ownership analysis - by Edd PV
+        | -typedownership    enable typed ownership analysis (runs type inference first) - by Edd PV
         | -available         enable available expressions analysis
         | -vbusy             enable very busy expressions analysis
         | -reaching          enable reaching definitions analysis
@@ -394,7 +394,7 @@ object Tip extends App {
           options.steensgaard = true
         case "-sign" | "-livevars" | "-available" | "-vbusy" | "-reaching" |
             "-constprop" | "-interval" | "-copyconstprop" | "-uninitvars" |
-            "-taint" | "-ownership" =>
+            "-taint" | "-ownership" | "-typedownership" =>
           options.dfAnalysis += dfa.withName(args(i).drop(1)) -> {
             if (
               i + 1 < args.length && dfo.values

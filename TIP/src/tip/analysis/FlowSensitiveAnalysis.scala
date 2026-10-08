@@ -38,7 +38,7 @@ object FlowSensitiveAnalysis {
         Some(kind match {
           case Analysis.sign => new SimpleSignAnalysis(typedCfg.left.get); //  same functionality as SignAnalysis.Intraprocedural.SimpleSolver(typedCfg.left.get)
           case Analysis.ownership => new OwnershipAnalysis(typedCfg.left.get); //
-          case Analysis.typedownership => new OwnershipAnalysis(typedCfg.left.get);
+          case Analysis.typedownership => new TypedOwnershipAnalysis(typedCfg.left.get);
           case Analysis.livevars => new LiveVarsAnalysisSimpleSolver(typedCfg.left.get)
           case Analysis.available => new AvailableExpAnalysisSimpleSolver(typedCfg.left.get)
           //case Analysis.vbusy => new VeryBusyExpAnalysisSimpleSolver(typedCfg.left.get) <--- Complete here
