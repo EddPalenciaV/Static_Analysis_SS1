@@ -82,6 +82,7 @@ object FlowSensitiveAnalysis {
         Some(kind match {
           case Analysis.sign => new SignAnalysis.Interprocedural.WorklistSolverWithReachability(typedCfg.right.get)
           case Analysis.constprop => new ConstantPropagationAnalysis.Interprocedural.WorklistSolverWithReachability(typedCfg.right.get)
+          case Analysis.ownership => new InterprocOwnershipAnalysis(typedCfg.right.get)
           case _ => throw new RuntimeException(s"Unsupported solver option `$options` for the analysis $kind")
         })
       case AnalysisOption.`iwlrp` =>
