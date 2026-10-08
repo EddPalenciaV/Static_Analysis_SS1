@@ -80,7 +80,7 @@ trait OwnershipFunctions {
         if (env(declData(ref.id)) == FlatEl(Other))
           msgs.message(msgs.Reason.None, ref.loc)
         else
-          msgs.message(msgs.Reason.OwnershipError, ref.loc, s"cannot take address of non-stack variable: ${ref.id.name}")
+          msgs.message(msgs.Reason.OwnershipError, ref.loc, s"cannot take address of non-stack variable: ${ref.id}")
         FlatEl(Pointer)
       case AUnaryOp(DerefOp, sub, loc) =>
         // overloaded dereference: allowed through a pointer or by the owner of a heap cell
@@ -88,9 +88,9 @@ trait OwnershipFunctions {
           case FlatEl(Pointer) | FlatEl(HeapOwner) =>
             msgs.message(msgs.Reason.None, loc)
           case Top =>
-            msgs.message(msgs.Reason.OwnershipWarning, loc, s"dereference when may not be owner: ${nameOf(sub)}")
+            msgs.message(msgs.Reason.OwnershipWarning, loc, s"dereference when may not be owner: $sub")
           case _ =>
-            msgs.message(msgs.Reason.OwnershipError, loc, s"illegal dereference when not owner: ${nameOf(sub)}")
+            msgs.message(msgs.Reason.OwnershipError, loc, s"illegal dereference when not owner: $sub")
         }
         FlatEl(Other) // all heap cells and pointers contain integers
       case _: ANull => FlatEl(Pointer)
@@ -131,7 +131,7 @@ trait OwnershipFunctions {
               case FlatEl(Pointer) | FlatEl(HeapOwner) =>
                 msgs.message(msgs.Reason.None, dw.loc)
               case _ =>
-                msgs.message(msgs.Reason.OwnershipError, dw.loc, s"illegal store when not owner or pointer: ${nameOf(dw.exp)}")
+                msgs.message(msgs.Reason.OwnershipError, dw.loc, s"illegal store when not owner or pointer: ${dw.exp}")
             }
             s
 
